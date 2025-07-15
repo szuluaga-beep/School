@@ -21,7 +21,7 @@ Este proyecto está construido usando .NET MVC y requiere SQL Express para la bas
   Inicia el proyecto usando el siguiente comando:  
 
 4. **Acceder a la Aplicación**  
-  Abre tu navegador y navega a `http://localhost:5000` o al puerto especificado en la salida de la terminal.  
+  Abre tu navegador y navega a `http://localhost:7042` o al puerto especificado en la salida de la terminal.  
 
 ## Notas  
 - No se requiere configuración de Docker ni de bases de datos externas; SQL Express maneja la base de datos localmente.  
