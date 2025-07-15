@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using School.Data;
 using School.Models;
+using School.Models.ViewModel;
 
 namespace School.Controllers
 {
@@ -22,7 +23,9 @@ namespace School.Controllers
         // GET: Students
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Student.ToListAsync());
+            var model = await PopulateListCoursesAndStudents();
+
+            return View(model);
         }
 
         // GET: Students/Details/5
@@ -152,6 +155,36 @@ namespace School.Controllers
         private bool StudentExists(int id)
         {
             return _context.Student.Any(e => e.Id == id);
+        }
+
+        private async Task<StudentViewModel> PopulateListCoursesAndStudents(string? selectedCourse = null)
+        {
+            var courses = await _context.Course
+                .OrderBy(c => c.Name)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var students = await _context.Student
+                .Include(s => s.CourseStudents)
+                .ThenInclude(cs => cs.Course)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var model = new StudentViewModel();
+
+            model.Students = students;
+
+            foreach (var course in courses)
+            {
+                model.SelectListCourses.Add(new SelectListItem
+                {
+                    Value = course.Id.ToString(),
+                    Text = course.CourseCode + " - " + course.Name,
+                    Selected = selectedCourse != null && selectedCourse == course.Id.ToString()
+                });
+            }
+
+            return model;
         }
     }
 }
