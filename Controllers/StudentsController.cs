@@ -37,13 +37,20 @@ namespace School.Controllers
             }
 
             var student = await _context.Student
+                .Include(c=>c.CourseStudents)
+                .ThenInclude(c=>c.Course)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (student == null)
             {
                 return NotFound();
             }
 
-            return View(student);
+            var model = new StudentViewModel()
+            {
+                Student = student
+            };
+            return View(model);
         }
 
         // GET: Students/Create
@@ -62,7 +69,7 @@ namespace School.Controllers
             return View(model);
         }
 
-        // Fix for MVC1004: Rename the parameter to avoid conflict with the property name in StudentViewModel.  
+        // Fix for MVC1004: Rename the parameter to avoid conflict with the property name in StudentViewModel.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Student,SelectedCourse")] StudentViewModel studentViewModel)
@@ -85,7 +92,6 @@ namespace School.Controllers
                     return View(studentViewModel);
                 }
 
-                
                 var courseStudent = new CourseStudent
                 {
                     Student = studentViewModel.Student,
@@ -110,10 +116,15 @@ namespace School.Controllers
             }
 
             var student = await _context.Student.FindAsync(id);
+
             if (student == null)
             {
                 return NotFound();
             }
+
+            var model = new StudentViewModel();
+            model.Student = student;
+
             return View(student);
         }
 
