@@ -26,6 +26,24 @@ namespace School.Data
             modelBuilder.Entity<Student>().ToTable("Student")
                 .HasIndex(s => s.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<Course>()
+                .HasMany(c => c.Students)
+                .WithMany(s => s.Courses)
+                .UsingEntity<CourseStudent>(
+                    j => j
+                        .HasOne(cs => cs.Student)
+                        .WithMany(s => s.CourseStudents)
+                        .HasForeignKey(cs => cs.StudentId),
+                    j => j
+                        .HasOne(cs => cs.Course)
+                        .WithMany(c => c.CourseStudents)
+                        .HasForeignKey(cs => cs.CourseId),
+                    j =>
+                    {
+                        j.ToTable("CourseStudent");
+                        j.HasKey(cs => new { cs.StudentId, cs.CourseId });
+                    });
         }
     }
 }

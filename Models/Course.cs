@@ -18,5 +18,9 @@ namespace School.Models
 
         [Range(1, 5)]
         public int Credits { get; set; }
+
+        public List<CourseStudent> CourseStudents { get; set; } = [];
+
+        public List<Student> Students { get; set; } = [];
     }
 }

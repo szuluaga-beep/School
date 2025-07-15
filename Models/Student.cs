@@ -19,5 +19,8 @@ namespace School.Models
         [Required]
         [Display(Name = "Identity Document")]
         public string Document { get; set; } = null!;
+
+        public List<CourseStudent> CourseStudents { get; set; } = [];
+        public List<Course> Courses { get; set; } = [];
     }
 }
