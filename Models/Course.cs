@@ -6,6 +6,9 @@ namespace School.Models
     {
         public int Id { get; set; }
 
+        [Required]
+        [StringLength(100, ErrorMessage = "Course name cannot exceed 100 characters.")]
+        [Display(Name = "Course Name")]
         public string Name { get; set; } = null!;
 
         [Required]
@@ -13,7 +16,7 @@ namespace School.Models
         [Display(Name = "Course Code")]
         public string CourseCode { get; set; } = null!;
 
-        [Range(1, 5, ErrorMessage = "Credits must be between {0} and {1}.")]
+        [Range(1, 5)]
         public int Credits { get; set; }
     }
 }
