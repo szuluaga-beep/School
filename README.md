@@ -1,14 +1,4 @@
 
-
-<img width="1381" height="600" alt="image" src="https://github.com/user-attachments/assets/6e013102-c170-4511-9f7d-9518b5943c95" />
-
-
-<img width="1445" height="836" alt="image" src="https://github.com/user-attachments/assets/7bc77892-3236-4882-90b4-35cf397d6359" />
-
-<img width="1732" height="763" alt="image" src="https://github.com/user-attachments/assets/6e66937c-85ed-459f-aff4-4744b30649e5" />
-
-<img width="1376" height="550" alt="image" src="https://github.com/user-attachments/assets/4c1373b6-4519-4b1f-88db-15a9ece69773" />
-
 # Cómo Ejecutar el Proyecto  
 
 Este proyecto está construido usando .NET MVC y requiere SQL Express para la base de datos. Sigue los pasos a continuación para configurar y ejecutar el proyecto:  
@@ -36,3 +26,17 @@ Este proyecto está construido usando .NET MVC y requiere SQL Express para la bas
 ## Notas  
 - No se requiere configuración de Docker ni de bases de datos externas; SQL Express maneja la base de datos localmente.  
 - Asegúrate de que la cadena de conexión en `appsettings.json` esté configurada correctamente para SQL Express.
+
+
+- **Capturas de Pantalla**  
+  Aquí hay algunas capturas de pantalla del proyecto en ejecución:
+
+
+<img width="1381" height="600" alt="image" src="https://github.com/user-attachments/assets/6e013102-c170-4511-9f7d-9518b5943c95" />
+
+
+<img width="1445" height="836" alt="image" src="https://github.com/user-attachments/assets/7bc77892-3236-4882-90b4-35cf397d6359" />
+
+<img width="1732" height="763" alt="image" src="https://github.com/user-attachments/assets/6e66937c-85ed-459f-aff4-4744b30649e5" />
+
+<img width="1376" height="550" alt="image" src="https://github.com/user-attachments/assets/4c1373b6-4519-4b1f-88db-15a9ece69773" />
