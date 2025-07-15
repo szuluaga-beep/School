@@ -1,4 +1,4 @@
-﻿@model School.Models.Student
+﻿@model School.Models.ViewModel.StudentViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -9,23 +9,31 @@
 <h4>Student</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+    <div class="col-md-12">
+        <form asp-action="Create" class="d-flex flex-column gap-2">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="FullName" class="control-label"></label>
-                <input asp-for="FullName" class="form-control" />
-                <span asp-validation-for="FullName" class="text-danger"></span>
+
+            <div>
+                <label asp-for="SelectListCourses" class="control-label"></label>
+                <select asp-for="SelectedCourse" class="form-select" asp-items="Model.SelectListCourses">
+                    <option value="">Select a Course</option>
+                </select>
+                <span asp-validation-for="SelectedCourse" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+                <label asp-for="Student.FullName" class="control-label"></label>
+                <input asp-for="Student.FullName" class="form-control" />
+                <span asp-validation-for="Student.FullName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Document" class="control-label"></label>
-                <input asp-for="Document" class="form-control" />
-                <span asp-validation-for="Document" class="text-danger"></span>
+                <label asp-for="Student.Email" class="control-label"></label>
+                <input asp-for="Student.Email" class="form-control" />
+                <span asp-validation-for="Student.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Student.Document" class="control-label"></label>
+                <input asp-for="Student.Document" class="form-control" />
+                <span asp-validation-for="Student.Document" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -33,11 +41,14 @@
         </form>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="mt-2">
+    <a asp-action="Index" class="btn btn-outline-dark">Back to List</a>
 </div>
 
+
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

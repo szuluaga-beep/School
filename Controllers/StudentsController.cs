@@ -49,23 +49,56 @@ namespace School.Controllers
         // GET: Students/Create
         public IActionResult Create()
         {
-            return View();
+            var model = new StudentViewModel();
+            model.SelectListCourses = _context.Course
+                .OrderBy(c => c.Name)
+                .AsNoTracking()
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.CourseCode + " - " + c.Name
+                }).ToList();
+            model.Student = new Student();
+            return View(model);
         }
 
-        // POST: Students/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Fix for MVC1004: Rename the parameter to avoid conflict with the property name in StudentViewModel.  
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FullName,Email,Document")] Student student)
+        public async Task<IActionResult> Create([Bind("Student,SelectedCourse")] StudentViewModel studentViewModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(student);
+                var course = await _context.Course.FirstOrDefaultAsync(c => c.Id == studentViewModel.SelectedCourse);
+
+                if (course == null)
+                {
+                    ModelState.AddModelError("SelectedCourse", "The selected course does not exist.");
+                    return View(studentViewModel);
+                }
+
+                var studentExists = await _context.Student.FirstOrDefaultAsync(s => s.Email == studentViewModel.Student.Email);
+
+                if (studentExists != null)
+                {
+                    ModelState.AddModelError("Student.Email", "A student with this email already exists.");
+                    return View(studentViewModel);
+                }
+
+                
+                var courseStudent = new CourseStudent
+                {
+                    Student = studentViewModel.Student,
+                    Course = course
+                };
+
+                _context.Add(studentViewModel.Student);
+                _context.Add(courseStudent);
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(student);
+            return View(studentViewModel);
         }
 
         // GET: Students/Edit/5
@@ -157,7 +190,7 @@ namespace School.Controllers
             return _context.Student.Any(e => e.Id == id);
         }
 
-        private async Task<StudentViewModel> PopulateListCoursesAndStudents(string? selectedCourse = null)
+        private async Task<StudentsViewModel> PopulateListCoursesAndStudents(string? selectedCourse = null)
         {
             var courses = await _context.Course
                 .OrderBy(c => c.Name)
@@ -170,7 +203,7 @@ namespace School.Controllers
                 .AsNoTracking()
                 .ToListAsync();
 
-            var model = new StudentViewModel();
+            var model = new StudentsViewModel();
 
             model.Students = students;
 

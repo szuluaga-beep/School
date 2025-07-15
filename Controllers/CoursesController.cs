@@ -49,18 +49,33 @@ namespace School.Controllers
             return View();
         }
 
-        // POST: Courses/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Courses/Create  
+        // To protect from overposting attacks, enable the specific properties you want to bind to.  
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.  
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,CourseCode,Credits")] Course course)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(course);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    var courseExists = await _context.Course.FirstOrDefaultAsync(c => c.CourseCode == course.CourseCode);
+                    if (courseExists != null)
+                    {
+                        ModelState.AddModelError("CourseCode", $"A course with the code '{course.CourseCode}' already exists.");
+                        return View(course);
+                    }
+
+                    _context.Add(course);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, $"An error occurred while creating the course: {ex.Message}");
+                    return View(course);
+                }
             }
             return View(course);
         }
