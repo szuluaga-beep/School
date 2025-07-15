@@ -37,8 +37,8 @@ namespace School.Controllers
             }
 
             var student = await _context.Student
-                .Include(c=>c.CourseStudents)
-                .ThenInclude(c=>c.Course)
+                .Include(c => c.CourseStudents)
+                .ThenInclude(c => c.Course)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (student == null)
@@ -115,17 +115,37 @@ namespace School.Controllers
                 return NotFound();
             }
 
-            var student = await _context.Student.FindAsync(id);
+            var student = await _context.Student
+               .Include(c => c.CourseStudents)
+               .ThenInclude(c => c.Course)
+               .FirstOrDefaultAsync(m => m.Id == id);
 
             if (student == null)
             {
                 return NotFound();
             }
 
+            var courses = await _context.Course
+               .OrderBy(c => c.Name)
+               .AsNoTracking()
+               .ToListAsync();
+
+
+
             var model = new StudentViewModel();
             model.Student = student;
 
-            return View(student);
+            foreach (var course in courses)
+            {
+                model.SelectListCourses.Add(new SelectListItem
+                {
+                    Value = course.Id.ToString(),
+                    Text = course.CourseCode + " - " + course.Name + " - " + course.Credits
+
+                });
+            }
+
+            return View(model);
         }
 
         // POST: Students/Edit/5
@@ -133,9 +153,9 @@ namespace School.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,Email,Document")] Student student)
+        public async Task<IActionResult> Edit(int id, [Bind("Student,SelectedCourse")] StudentViewModel studentViewModel)
         {
-            if (id != student.Id)
+            if (id != studentViewModel.Student.Id)
             {
                 return NotFound();
             }
@@ -144,12 +164,43 @@ namespace School.Controllers
             {
                 try
                 {
-                    _context.Update(student);
+                    // Validate that the student does not have more than 3 courses with 4 credits  
+                    var studentCourses = await _context.Student
+                        .Include(cs => cs.CourseStudents)
+                        .ThenInclude(cs => cs.Course)
+                        .Where(s => s.Id == id)
+                        .SelectMany(s => s.CourseStudents.Select(cs => cs.Course))
+                        .ToListAsync();
+
+                    var fourCreditCoursesCount = studentCourses.Count(c => c.Credits == 4);
+
+                    if (fourCreditCoursesCount >= 3)
+                    {
+                        ModelState.AddModelError("SelectedCourse", "The student cannot have more than 3 courses with 4 credits.");
+                        return View(studentViewModel);
+                    }
+
+                    var course = await _context.Course.FirstOrDefaultAsync(c => c.Id == studentViewModel.SelectedCourse);
+
+                    if (course == null)
+                    {
+                        ModelState.AddModelError("SelectedCourse", "The selected course does not exist.");
+                        return View(studentViewModel);
+                    }
+
+                    var courseStudent = new CourseStudent
+                    {
+                        Student = studentViewModel.Student,
+                        Course = course
+                    };
+
+                    _context.Update(studentViewModel.Student);
+                    _context.Add(courseStudent);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StudentExists(student.Id))
+                    if (!StudentExists(studentViewModel.Student.Id))
                     {
                         return NotFound();
                     }
@@ -160,7 +211,7 @@ namespace School.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(student);
+            return View(studentViewModel);
         }
 
         // GET: Students/Delete/5

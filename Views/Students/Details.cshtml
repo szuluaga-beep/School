@@ -34,9 +34,9 @@
                Courses:  
            </p>  
            @foreach(var course in Model.Student.CourseStudents){  
-               <div class="pl-3">  
+               <span class="badge bg-primary">  
                   @Html.DisplayFor(Model => course.Course.Name)  
-               </div>  
+               </span>  
            }  
        </dd>  
    </dl>  
